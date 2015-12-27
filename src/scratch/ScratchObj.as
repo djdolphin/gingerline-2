@@ -579,23 +579,45 @@ public class ScratchObj extends Sprite {
 
 	/* Saving */
 
-	public function writeJSON(json:util.JSON):void {
+	public function writeJSON(json:util.JSON, compile:Boolean = false):void {
 		var allScripts:Array = [];
+		var allVariables:Array = variables.slice(0);
+		var allLists:Array = lists.slice(0);
+
 		for each (var b:Block in scripts) {
-			allScripts.push([b.x, b.y, BlockIO.stackToArray(b)]);
+			allScripts.push([b.x, b.y, BlockIO.stackToArray(b, compile)]);
 		}
 		var allComments:Array = [];
 		for each (var c:ScratchComment in scriptComments) {
 			allComments.push(c.toArray());
 		}
+
+		if (compile && this is ScratchStage) {
+			addBackgroundStuff(allScripts, allVariables, allLists);
+		}
+
 		json.writeKeyValue('objName', objName);
-		if (variables.length > 0)	json.writeKeyValue('variables', variables);
-		if (lists.length > 0)		json.writeKeyValue('lists', lists);
+		if (variables.length > 0)	json.writeKeyValue('variables', allVariables);
+		if (lists.length > 0)		json.writeKeyValue('lists', allLists);
 		if (scripts.length > 0)		json.writeKeyValue('scripts', allScripts);
 		if (scriptComments.length > 0) json.writeKeyValue('scriptComments', allComments);
 		if (sounds.length > 0)		json.writeKeyValue('sounds', sounds);
 		json.writeKeyValue('costumes', costumes);
 		json.writeKeyValue('currentCostumeIndex', currentCostumeIndex);
+	}
+
+	private function addBackgroundStuff(allScripts:Array, allVariables:Array, allLists:Array) {
+		var ops = Scratch.app.runtime.getSpecialOpsUsed();
+
+		if (ops.indexOf('whenCondition') > -1) {
+			allVariables.push(new Variable(Specs.LAST_TIME_VAR, 0))
+			allScripts.push(
+				[10, 10, [
+					["whenGreenFlag"],
+					["setVar:to:", Specs.LAST_TIME_VAR, ["timer"]]
+				]
+			]);
+		}
 	}
 
 	public function readJSON(jsonObj:Object):void {

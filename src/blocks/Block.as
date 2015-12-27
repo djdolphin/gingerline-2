@@ -48,7 +48,7 @@ import flash.display.*;
 public class Block extends Sprite {
 
 	private const minCommandWidth:int = 36;
-	private const minHatWidth:int = 80;
+	private const minHatWidth:int = 100;
 	private const minLoopWidth:int = 80;
 
 	public static var argTextFormat:TextFormat;

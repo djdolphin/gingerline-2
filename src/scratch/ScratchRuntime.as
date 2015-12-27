@@ -158,7 +158,7 @@ public class ScratchRuntime {
 		processEdgeTriggeredHats();
 		interp.stepThreads();
 		app.stagePane.commitPenStrokes();
-		
+
 		if (ready==ReadyLabel.COUNTDOWN || ready==ReadyLabel.READY) {
 			app.stagePane.countdown(count);
 		}
@@ -173,7 +173,7 @@ public class ScratchRuntime {
 	private var videoPosition:int;
 	private var videoSeconds:Number;
 	private var videoAlreadyDone:int;
-	
+
 	private var projectSound:Boolean;
 	private var micSound:Boolean;
 	private var showCursor:Boolean;
@@ -182,14 +182,14 @@ public class ScratchRuntime {
 	private var videoWidth:int;
 	private var videoHeight:int;
 	public var ready:int=ReadyLabel.NOT_READY;
-	
+
 	private var micBytes:ByteArray;
 	private var micPosition:int = 0;
 	private var mic:Microphone;
 	private var micReady:Boolean;
-	
+
 	private var timeout:int;
-	
+
 	private function saveFrame():void {
 		saveSound();
 		var t:Number = getTimer()*.001-videoSeconds;
@@ -268,7 +268,7 @@ public class ScratchRuntime {
 			videoFrames.push(f);
 		}
 	}
-	
+
 	private function saveSound():void {
 		var floats:Array = [];
 		if (micSound && micBytes.length>0) {
@@ -309,17 +309,17 @@ public class ScratchRuntime {
 		videoSounds.push(combinedStream);
 		combinedStream = null;
 	}
-	
-	private function micSampleDataHandler(event:SampleDataEvent):void 
-	{ 
-	    while(event.data.bytesAvailable) 
+
+	private function micSampleDataHandler(event:SampleDataEvent):void
+	{
+	    while(event.data.bytesAvailable)
 	    {
-	        var sample:Number = event.data.readFloat(); 
-	        micBytes.writeFloat(sample);  
+	        var sample:Number = event.data.readFloat();
 	        micBytes.writeFloat(sample);
-	    } 
-	} 
-	
+	        micBytes.writeFloat(sample);
+	    }
+	}
+
 	public function startVideo(editor:RecordingSpecEditor):void {
 		projectSound = editor.soundFlag();
 		micSound = editor.microphoneFlag();
@@ -331,10 +331,10 @@ public class ScratchRuntime {
 		}
 		micReady = true;
 		if (micSound) {
-			mic = Microphone.getMicrophone(); 
+			mic = Microphone.getMicrophone();
 			mic.setSilenceLevel(0);
-			mic.gain = editor.getMicVolume(); 
-			mic.rate = 44; 
+			mic.gain = editor.getMicVolume();
+			mic.rate = 44;
 			micReady=false;
 		}
 		if (fullEditor) {
@@ -366,7 +366,7 @@ public class ScratchRuntime {
 		baFlvEncoder.start();
 		waitAndStart();
 	}
-	
+
 	public function exportToVideo():void {
 		var specEditor:RecordingSpecEditor = new RecordingSpecEditor();
 		function startCountdown():void {
@@ -374,7 +374,7 @@ public class ScratchRuntime {
 		}
 		DialogBox.close("Record Project Video",null,specEditor,"Start",app.stage,startCountdown);
 	}
-	
+
 	public function stopVideo():void {
 		if (recording) videoTimer.dispatchEvent(new TimerEvent(TimerEvent.TIMER));
 		else if (ready==ReadyLabel.COUNTDOWN || ReadyLabel.READY) {
@@ -383,7 +383,7 @@ public class ScratchRuntime {
 			app.stagePane.countdown(0);
 		}
 	}
-	
+
 	public function finishVideoExport(event:TimerEvent):void {
 		stopRecording();
 		stopAll();
@@ -392,7 +392,7 @@ public class ScratchRuntime {
 		clearTimeout(timeout);
 		timeout = setTimeout(saveRecording,1);
 	}
-	
+
 	public function waitAndStart():void {
 		if (!micReady && !mic.hasEventListener(StatusEvent.STATUS)) {
 			micBytes = new ByteArray();
@@ -424,7 +424,7 @@ public class ScratchRuntime {
     	videoTimer.addEventListener(TimerEvent.TIMER, finishVideoExport);
     	videoTimer.start();
 	}
-	
+
 	public function stopRecording():void {
 		recording = false;
 		videoTimer.stop();
@@ -458,7 +458,7 @@ public class ScratchRuntime {
 				videoSounds[videoPosition]=null;
 				videoPosition++;
 			}
-			if (app.lp) app.lp.setProgress(Math.min((videoPosition-videoAlreadyDone) / (videoFrames.length-videoAlreadyDone), 1)); 
+			if (app.lp) app.lp.setProgress(Math.min((videoPosition-videoAlreadyDone) / (videoFrames.length-videoAlreadyDone), 1));
 			clearTimeout(timeout);
 			timeout = setTimeout(saveRecording, 1);
 			return;
@@ -491,7 +491,7 @@ public class ScratchRuntime {
 		}
 		DialogBox.close("Video Finished!","To save, click the button below.",null,"Save and Download",app.stage,saveFile,releaseVideo,null,true);
 	}
-	
+
 	private function roundToTens(x:Number):Number {
 		return int((x)*10)/10.;
 	}
@@ -629,6 +629,18 @@ public class ScratchRuntime {
 		('argValue' in b.args[0]) && b.args[0].argValue != 'ghost' && b.args[0].argValue != 'brightness');
 	}
 
+	public function getSpecialOpsUsed():Array {
+		var ops:Array = [];
+		allStacksAndOwnersDo(function (stack:Block, target:ScratchObj):void {
+			stack.allBlocksDo(function (b:Block) {
+				if (Specs.specialOps.indexOf(b.op) > -1 && ops.indexOf(b.op) == -1) {
+					ops.push(b.op);
+				}
+			});
+		});
+		return ops;
+	}
+
 	// -----------------------------
 	// Edge-trigger sensor hats
 	//------------------------------
@@ -648,6 +660,15 @@ public class ScratchRuntime {
 			if (('loudness' == sensorName && soundLevel() > threshold) ||
 					('timer' == sensorName && timer() > threshold) ||
 					('video motion' == sensorName && target.visible && VideoMotionPrims.readMotionSensor('motion', target) > threshold)) {
+				if (triggeredHats.indexOf(hat) == -1) { // not already trigged
+					// only start the stack if it is not already running
+					if (!interp.isRunning(hat, target)) interp.toggleThread(hat, target);
+				}
+				activeHats.push(hat);
+			}
+		} else if ('whenCondition' == hat.op) {
+			var condition:Boolean = interp.arg(hat, 0);
+			if (condition) {
 				if (triggeredHats.indexOf(hat) == -1) { // not already trigged
 					// only start the stack if it is not already running
 					if (!interp.isRunning(hat, target)) interp.toggleThread(hat, target);
@@ -748,10 +769,10 @@ public class ScratchRuntime {
 
 		var filter:FileFilter;
 		if (Scratch.app.isExtensionDevMode) {
-			filter = new FileFilter('ScratchX Project', '*.sbx;*.sb;*.sb2');
+			filter = new FileFilter('ScratchX Project', '*.gg;*.sbx;*.sb;*.sb2');
 		}
 		else {
-			filter = new FileFilter('Scratch Project', '*.sb;*.sb2');
+			filter = new FileFilter('Scratch Project', '*.gg;*.sb;*.sb2');
 		}
 		Scratch.loadSingleFile(fileLoadHandler, filter);
 	}

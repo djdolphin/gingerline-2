@@ -29,6 +29,7 @@
 package util {
 	import flash.display.BitmapData;
 	import flash.utils.*;
+	import scratch.ScratchObj;
 
 public class JSON {
 
@@ -38,11 +39,11 @@ public class JSON {
 	private var needsComma:Boolean = false;
 	private var doFormatting:Boolean;
 
-	public static function stringify(obj:*, doFormatting:Boolean = true):String {
+	public static function stringify(obj:*, doFormatting:Boolean = true, compile:Boolean = false):String {
 		// Return the JSON string representation for the given object.
 		var json:util.JSON = new util.JSON();
 		json.doFormatting = doFormatting;
-		json.write(obj);
+		json.write(obj, compile);
 		return json.buf;
 	}
 
@@ -264,15 +265,15 @@ public class JSON {
 	// Object to JSON support
 	//----------------------------
 
-	public function writeKeyValue(key:String, value:*):void {
+	public function writeKeyValue(key:String, value:*, compile:Boolean = true):void {
 		// This method is called by custom writeJSON() methods.
 		if (needsComma) buf += doFormatting ? ",\n" : ", ";
 		buf += tabs + '"' + key + '": ';
-		write(value);
+		write(value, compile);
 		needsComma = true;
 	}
 
-	private function write(value:*):void {
+	private function write(value:*, compile:Boolean = false):void {
 		// Write a value in JSON format. The argument of the top-level call is usually an object or array.
 		if (value is Number) buf += isFinite(value) ? value : '0';
 		else if (value is Boolean) buf += value;
@@ -281,10 +282,10 @@ public class JSON {
 		else if (value == null) buf += "null";
 		else if (value is Array) writeArray(value);
 		else if (value is BitmapData) buf += "null"; // bitmaps sometimes appear in old project info objects
-		else writeObject(value);
+		else writeObject(value, compile);
 	}
 
-	private function writeObject(obj:*):void {
+	private function writeObject(obj:*, compile:Boolean = false):void {
 		var savedNeedsComma:Boolean = needsComma;
 		needsComma = false;
 		buf += "{";
@@ -292,6 +293,8 @@ public class JSON {
 		indent();
 		if (isClass(obj, 'Object') || isClass(obj, 'Dictonary')) {
 			for (var k:String in obj) writeKeyValue(k, obj[k]);
+		} else if (obj is ScratchObj) {
+			obj.writeJSON(this, compile);
 		} else {
 			obj.writeJSON(this);
 		}

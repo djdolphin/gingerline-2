@@ -228,6 +228,8 @@ public class Specs {
 		["when I receive %m.broadcast",			"h", 5, "whenIReceive",			""],
 		["broadcast %m.broadcast",				" ", 5, "broadcast:",			""],
 		["broadcast %m.broadcast and wait",		" ", 5, "doBroadcastAndWait",	""],
+		["--"],
+		["when %b",								"h", 5, "whenCondition"],
 
 		// control - sprite
 		["wait %n secs",						" ", 6, "wait:elapsed:from:",	1],
@@ -397,5 +399,13 @@ public class Specs {
 	];
 
 	public static var extensionSpecs:Array = ["when %m.booleanSensor", "when %m.sensor %m.lessMore %n", "sensor %m.booleanSensor?", "%m.sensor sensor value", "turn %m.motor on for %n secs", "turn %m.motor on", "turn %m.motor off", "set %m.motor power to %n", "set %m.motor2 direction to %m.motorDirection", "when distance %m.lessMore %n", "when tilt %m.eNe %n", "distance", "tilt"];
+
+	/* Special blocks */
+
+	public static var specialOps:Array = [
+		"whenCondition"
+	];
+
+	public static const LAST_TIME_VAR:String = "\u00a7 last time";
 
 }}

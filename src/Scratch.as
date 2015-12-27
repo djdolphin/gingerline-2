@@ -92,7 +92,7 @@ public class Scratch extends Sprite {
 	public var isMicroworld:Boolean = false;
 
 	public var presentationScale:Number;
-	
+
 	// Runtime
 	public var runtime:ScratchRuntime;
 	public var interp:Interpreter;
@@ -622,6 +622,7 @@ public class Scratch extends Sprite {
 	public function setProjectName(s:String):void {
 		if (s.slice(-3) == '.sb') s = s.slice(0, -3);
 		if (s.slice(-4) == '.sb2') s = s.slice(0, -4);
+		if (s.slice(-3) == '.gg') s = s.slice(0, -3);
 		stagePart.setProjectName(s);
 	}
 
@@ -882,15 +883,15 @@ public class Scratch extends Sprite {
 
 		updateLayout(w, h);
 	}
-	
+
 	public function updateRecordingTools(t:Number):void {
 		stagePart.updateRecordingTools(t);
 	}
-	
+
 	public function removeRecordingTools():void {
 		stagePart.removeRecordingTools();
 	}
-	
+
 	public function refreshStagePart():void {
 		stagePart.refresh();
 	}
@@ -1050,7 +1051,7 @@ public class Scratch extends Sprite {
 
 		m.showOnStage(stage, b.x, topBarPart.bottom() - 1);
 	}
-	
+
 	public function stopVideo(b:*):void {
 		runtime.stopVideo();
 	}
@@ -1058,6 +1059,10 @@ public class Scratch extends Sprite {
 	protected function addFileMenuItems(b:*, m:Menu):void {
 		m.addItem('Load Project', runtime.selectProjectFile);
 		m.addItem('Save Project', exportProjectToFile);
+		m.addItem('Compile Project', function ():void {
+			exportProjectToFile(false, true);
+		});
+		m.addLine();
 		if (runtime.recording || runtime.ready==ReadyLabel.COUNTDOWN || runtime.ready==ReadyLabel.READY) {
 			m.addItem('Stop Video', runtime.stopVideo);
 		} else {
@@ -1168,7 +1173,7 @@ public class Scratch extends Sprite {
 
 		function save():void {
 			d.cancel();
-			exportProjectToFile(false, postSaveAction);
+			exportProjectToFile(false, false, postSaveAction);
 		}
 
 		if (postSaveAction == null) postSaveAction = doNothing;
@@ -1184,13 +1189,13 @@ public class Scratch extends Sprite {
 		d.showOnStage(stage);
 	}
 
-	public function exportProjectToFile(fromJS:Boolean = false, saveCallback:Function = null):void {
+	public function exportProjectToFile(fromJS:Boolean = false, compile:Boolean = false, saveCallback:Function = null):void {
 		function squeakSoundsConverted():void {
 			scriptsPane.saveScripts(false);
-			var projectType:String = extensionManager.hasExperimentalExtensions() ? '.sbx' : '.sb2';
+			var projectType:String = !compile ? '.gg' : extensionManager.hasExperimentalExtensions() ? '.sbx' : '.sb2';
 			var defaultName:String = StringUtil.trim(projectName());
 			defaultName = ((defaultName.length > 0) ? defaultName : 'project') + projectType;
-			var zipData:ByteArray = projIO.encodeProjectAsZipFile(stagePane);
+			var zipData:ByteArray = projIO.encodeProjectAsZipFile(stagePane, compile);
 			var file:FileReference = new FileReference();
 			file.addEventListener(Event.COMPLETE, fileSaved);
 			file.save(zipData, fixFileName(defaultName));

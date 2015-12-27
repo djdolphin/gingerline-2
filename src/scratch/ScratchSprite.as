@@ -650,8 +650,8 @@ public class ScratchSprite extends ScratchObj {
 
 	/* Saving */
 
-	public override function writeJSON(json:util.JSON):void {
-		super.writeJSON(json);
+	public override function writeJSON(json:util.JSON, compile:Boolean = false):void {
+		super.writeJSON(json, compile);
 		json.writeKeyValue('scratchX', scratchX);
 		json.writeKeyValue('scratchY', scratchY);
 		json.writeKeyValue('scale', scaleX);

@@ -91,7 +91,7 @@ public class ScratchStage extends ScratchObj {
 	public function setTempo(bpm:Number):void {
 		tempoBPM = Math.max(20, Math.min(bpm, 500));
 	}
-	
+
 	public function countdown(number:int=-1):void {
 		if (overlay) {
 			removeChild(overlay);
@@ -126,7 +126,7 @@ public class ScratchStage extends ScratchObj {
 		arrowText.x = 28;
 		arrowText.y = 328;
 	}
-	
+
 	private function makeLabel(s:String, fontSize:int):TextField {
 		var tf:TextField = new TextField();
 		tf.selectable = false;
@@ -278,7 +278,7 @@ public class ScratchStage extends ScratchObj {
 		m.addItem('save picture of stage', saveScreenshot);
 		return m;
 	}
-	
+
 	public function saveScreenData():BitmapData {
 		var bm:BitmapData = new BitmapData(STAGEW,STAGEH, false);
 		if (videoImage) videoImage.visible = false;
@@ -306,7 +306,7 @@ public class ScratchStage extends ScratchObj {
 		if (videoImage) videoImage.visible = true;
 		return bm;
 	}
-	
+
 	private function saveScreenshot():void {
 		var bitmapData:BitmapData = new BitmapData(STAGEW, STAGEH, true, 0);
 		bitmapData.draw(this);
@@ -830,8 +830,8 @@ public class ScratchStage extends ScratchObj {
 
 	/* Saving */
 
-	public override function writeJSON(json:util.JSON):void {
-		super.writeJSON(json);
+	public override function writeJSON(json:util.JSON, compile:Boolean = false):void {
+		super.writeJSON(json, compile);
 		var children:Array = [];
 		for (var i:int = 0; i < numChildren; i++) {
 			var c:DisplayObject = getChildAt(i);

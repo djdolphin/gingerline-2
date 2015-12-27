@@ -39,12 +39,16 @@ public class BlockIO {
 		return arrayToStack(util.JSON.parse(s) as Array, forStage);
 	}
 
-	public static function stackToArray(b:Block):Array {
+	public static function stackToArray(b:Block, compile:Boolean = false):Array {
 		// Return an array structure representing this entire stack.
 		if (b == null) return null;
 		var result:Array = [];
 		while (b != null) {
-			result.push(blockToArray(b));
+			if (compile && Specs.specialOps.indexOf(b.op) > -1) {
+				addSpecialBlockToStack(result, b);
+			} else {
+				result.push(blockToArray(b, compile));
+			}
 			b = b.nextBlock;
 		}
 		return result;
@@ -63,7 +67,27 @@ public class BlockIO {
 		return topBlock;
 	}
 
-	private static function blockToArray(b:Block):Array {
+	private static function addSpecialBlockToStack(stack:Array, b:Block):void {
+		var args:Array = b.normalizedArgs();
+		switch (b.op) {
+		case "whenCondition":
+			stack.push([
+				"whenSensorGreaterThan", "timer",
+				["+",
+					["readVariable", Specs.LAST_TIME_VAR],
+					["-", 1000000,
+						[
+							"*", 1000000, argToJSON(args[0], true)
+						]
+					]
+				]
+			]);
+			stack.push(["setVar:to:", Specs.LAST_TIME_VAR, ["timer"]]);
+			break;
+		}
+	}
+
+	private static function blockToArray(b:Block, compile:Boolean = false):Array {
 		// Return an array structure for this block.
 		var result:Array = [b.op];
 		if (b.op == Specs.GET_VAR) return [Specs.GET_VAR, b.spec];		// variable reporter
@@ -74,19 +98,23 @@ public class BlockIO {
 		if (b.op == Specs.CALL) result = [Specs.CALL, b.spec];			// procedure call - arguments follow spec
 		for each (var a:* in b.normalizedArgs()) {
 			// Note: arguments are always saved in normalized (i.e. left-to-right) order
-			if (a is Block) result.push(blockToArray(a));
-			if (a is BlockArg) {
-				var argVal:* = BlockArg(a).argValue;
-				if (argVal is ScratchObj) {
-					// convert a Scratch sprite/stage reference to a name string
-					argVal = ScratchObj(argVal).objName;
-				}
-				result.push(argVal);
-			}
+			result.push(argToJSON(a, false))
 		}
-		if (b.base.canHaveSubstack1()) result.push(stackToArray(b.subStack1));
-		if (b.base.canHaveSubstack2()) result.push(stackToArray(b.subStack2));
+		if (b.base.canHaveSubstack1()) result.push(stackToArray(b.subStack1, compile));
+		if (b.base.canHaveSubstack2()) result.push(stackToArray(b.subStack2, compile));
 		return result;
+	}
+
+	private static function argToJSON(a:*, compile:Boolean = false):* {
+		if (a is Block) return blockToArray(a, compile);
+		if (a is BlockArg) {
+			var argVal:* = BlockArg(a).argValue;
+			if (argVal is ScratchObj) {
+				// convert a Scratch sprite/stage reference to a name string
+				argVal = ScratchObj(argVal).objName;
+			}
+			return argVal;
+		}
 	}
 
 	private static function arrayToBlock(cmd:Array, undefinedBlockType:String, forStage:Boolean = false):Block {

@@ -63,7 +63,7 @@ public class ProjectIO {
 	// Encode a project or sprite as a ByteArray (a 'one-file' project)
 	//----------------------------
 
-	public function encodeProjectAsZipFile(proj:ScratchStage):ByteArray {
+	public function encodeProjectAsZipFile(proj:ScratchStage, compile:Boolean = false):ByteArray {
 		// Encode a project into a ByteArray. The format is a ZIP file containing
 		// the JSON project data and all images and sounds as files.
 		delete proj.info.penTrails; // remove the penTrails bitmap saved in some old projects' info
@@ -72,19 +72,19 @@ public class ProjectIO {
 		recordImagesAndSounds(proj.allObjects(), false, proj);
 		var zip:ZipIO = new ZipIO();
 		zip.startWrite();
-		addJSONData('project.json', proj, zip);
+		addJSONData('project.json', proj, zip, compile);
 		addImagesAndSounds(zip);
 		proj.clearPenLayer();
 		return zip.endWrite();
 	}
 
-	public function encodeSpriteAsZipFile(spr:ScratchSprite):ByteArray {
+	public function encodeSpriteAsZipFile(spr:ScratchSprite, compile:Boolean = false):ByteArray {
 		// Encode a sprite into a ByteArray. The format is a ZIP file containing
 		// the JSON sprite data and all images and sounds as files.
 		recordImagesAndSounds([spr], false);
 		var zip:ZipIO = new ZipIO();
 		zip.startWrite();
-		addJSONData('sprite.json', spr, zip);
+		addJSONData('sprite.json', spr, zip, compile);
 		addImagesAndSounds(zip);
 		return zip.endWrite();
 	}
@@ -93,9 +93,9 @@ public class ProjectIO {
 		return new ScratchStage();
 	}
 
-	private function addJSONData(fileName:String, obj:*, zip:ZipIO):void {
+	private function addJSONData(fileName:String, obj:*, zip:ZipIO, compile:Boolean = false):void {
 		var jsonData:ByteArray = new ByteArray();
-		jsonData.writeUTFBytes(util.JSON.stringify(obj));
+		jsonData.writeUTFBytes(util.JSON.stringify(obj, true, compile));
 		zip.write(fileName, jsonData, true);
 	}
 
