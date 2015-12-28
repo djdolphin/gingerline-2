@@ -441,6 +441,7 @@ public class Interpreter {
 		primTable["doBroadcastAndWait"]	= function(b:*):* { broadcast(arg(b, 0), true); }
 		primTable["whenIReceive"]		= primNoop;
 		primTable["whenCondition"]		= primNoop;
+		primTable["whenMouseScrolled"]	= primNoop;
 		primTable["doForeverIf"]		= function(b:*):* { if (arg(b, 0)) startCmdList(b.subStack1, true); else yield = true; };
 		primTable["doForLoop"]			= primForLoop;
 		primTable["doIf"]				= function(b:*):* { if (arg(b, 0)) startCmdList(b.subStack1); };

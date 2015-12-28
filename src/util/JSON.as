@@ -280,7 +280,7 @@ public class JSON {
 		else if (value is String) buf += '"' + encodeString(value) + '"';
 		else if (value is ByteArray) buf += '"' + encodeString(value.toString()) + '"';
 		else if (value == null) buf += "null";
-		else if (value is Array) writeArray(value);
+		else if (value is Array) writeArray(value, compile);
 		else if (value is BitmapData) buf += "null"; // bitmaps sometimes appear in old project info objects
 		else writeObject(value, compile);
 	}
@@ -310,14 +310,14 @@ public class JSON {
 		return i == (fullName.length - className.length);
 	}
 
-	private function writeArray(a:Array):void {
+	private function writeArray(a:Array, compile:Boolean = false):void {
 		var separator:String = ", ";
 		var indented:Boolean = doFormatting && ((a.length > 13) || needsMultipleLines(a, 13));
 		buf += "[";
 		indent();
 		if (indented) separator = ",\n" + tabs;
 		for (var i:int = 0; i < a.length; i++) {
-			write(a[i]);
+			write(a[i], compile);
 			if (i < (a.length - 1)) buf += separator;
 		}
 		outdent();

@@ -46,6 +46,7 @@ public class BlockIO {
 		while (b != null) {
 			if (compile && Specs.specialOps.indexOf(b.op) > -1) {
 				addSpecialBlockToStack(result, b);
+				if (b.op == 'whenMouseScrolled') break;
 			} else {
 				result.push(blockToArray(b, compile));
 			}
@@ -68,21 +69,34 @@ public class BlockIO {
 	}
 
 	private static function addSpecialBlockToStack(stack:Array, b:Block):void {
-		var args:Array = b.normalizedArgs();
+		var args:Array = b.normalizedArgs().map(function (arg) {
+			return argToJSON(arg, true);
+		});
+
 		switch (b.op) {
-		case "whenCondition":
+		case 'whenCondition':
 			stack.push([
-				"whenSensorGreaterThan", "timer",
-				["+",
-					["readVariable", Specs.LAST_TIME_VAR],
-					["-", 1000000,
+				'whenSensorGreaterThan', 'timer',
+				['+',
+					['readVariable', Specs.LAST_TIME_VAR],
+					['-', 1000000,
 						[
-							"*", 1000000, argToJSON(args[0], true)
+							'*', 1000000, args[0]
 						]
 					]
 				]
 			]);
-			stack.push(["setVar:to:", Specs.LAST_TIME_VAR, ["timer"]]);
+			stack.push(['setVar:to:', Specs.LAST_TIME_VAR, ['timer']]);
+			break;
+		case 'whenMouseScrolled':
+			stack.push(['whenKeyPressed', args[0] + ' arrow']);
+			stack.push([
+				'doIf',
+				['not',
+					['keyPressed:', args[0] + ' arrow']
+				],
+				stackToArray(b.nextBlock, true)
+			]);
 			break;
 		}
 	}

@@ -221,15 +221,16 @@ public class Specs {
 		["when @greenFlag clicked",				"h", 5, "whenGreenFlag"],
 		["when %m.key key pressed",				"h", 5, "whenKeyPressed", 		"space"],
 		["when this sprite clicked",			"h", 5, "whenClicked"],
-		["when backdrop switches to %m.backdrop", "h", 5, "whenSceneStarts", 	"backdrop1"],
+		["when mouse scrolled %m.scrollDirection", "h", 5, "whenMouseScrolled", "up"],
 		["--"],
+		["when %b",								"h", 5, "whenCondition"],
 		["when %m.triggerSensor > %n",			"h", 5, "whenSensorGreaterThan", "loudness", 10],
+		["--"],
+		["when backdrop switches to %m.backdrop", "h", 5, "whenSceneStarts", 	"backdrop1"],
 		["--"],
 		["when I receive %m.broadcast",			"h", 5, "whenIReceive",			""],
 		["broadcast %m.broadcast",				" ", 5, "broadcast:",			""],
 		["broadcast %m.broadcast and wait",		" ", 5, "doBroadcastAndWait",	""],
-		["--"],
-		["when %b",								"h", 5, "whenCondition"],
 
 		// control - sprite
 		["wait %n secs",						" ", 6, "wait:elapsed:from:",	1],
@@ -403,7 +404,7 @@ public class Specs {
 	/* Special blocks */
 
 	public static var specialOps:Array = [
-		"whenCondition"
+		"whenCondition", "whenMouseScrolled"
 	];
 
 	public static const LAST_TIME_VAR:String = "\u00a7 last time";

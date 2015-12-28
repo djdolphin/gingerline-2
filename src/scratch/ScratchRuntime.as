@@ -565,6 +565,15 @@ public class ScratchRuntime {
 		allStacksAndOwnersDo(startMatchingKeyHats);
 	}
 
+	public function startScrollHats(direction:String) {
+		allStacksAndOwnersDo(function (stack:Block, target:ScratchObj):void {
+			if (stack.op == 'whenMouseScrolled' && direction == stack.args[0].argValue) {
+				// only start the stack if it is not already running
+				if (!interp.isRunning(stack, target)) interp.toggleThread(stack, target);
+			}
+		});
+	}
+
 	public function collectBroadcasts():Array {
 		function addBlock(b:Block):void {
 			if ((b.op == 'broadcast:') ||

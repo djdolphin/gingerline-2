@@ -613,8 +613,8 @@ public class ScratchObj extends Sprite {
 			allVariables.push(new Variable(Specs.LAST_TIME_VAR, 0))
 			allScripts.push(
 				[10, 10, [
-					["whenGreenFlag"],
-					["setVar:to:", Specs.LAST_TIME_VAR, ["timer"]]
+					['whenGreenFlag'],
+					['setVar:to:', Specs.LAST_TIME_VAR, ['timer']]
 				]
 			]);
 		}

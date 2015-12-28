@@ -78,6 +78,7 @@ public class BlockMenus implements DragClient {
 		if (menuName == 'procMenu') menuHandler.procMenu(evt);
 		if (menuName == 'rotationStyle') menuHandler.rotationStyleMenu(evt);
 		if (menuName == 'scrollAlign') menuHandler.scrollAlignMenu(evt);
+		if (menuName == 'scrollDirection') menuHandler.scrollDirectionMenu(evt);
 		if (menuName == 'sensor') menuHandler.sensorMenu(evt);
 		if (menuName == 'sound') menuHandler.soundMenu(evt);
 		if (menuName == 'spriteOnly') menuHandler.spriteMenu(evt, false, false, false, true);
@@ -119,6 +120,7 @@ public class BlockMenus implements DragClient {
 			handler.procMenu(evt);
 			handler.rotationStyleMenu(evt);
 //			handler.scrollAlignMenu(evt);
+			handler.scrollDirectionMenu(evt);
 			handler.sensorMenu(evt);
 			handler.soundMenu(evt);
 			handler.spriteMenu(evt, false, false, false, true);
@@ -352,6 +354,13 @@ public class BlockMenus implements DragClient {
 			'bottom-left', 'bottom-right', 'middle', 'top-left', 'top-right'];
 		var m:Menu = new Menu(setBlockArg, 'scrollAlign');
 		for each (var s:String in options) m.addItem(s);
+		showMenu(m);
+	}
+
+	private function scrollDirectionMenu(evt:MouseEvent):void {
+		var m:Menu = new Menu(setBlockArg, 'scrollDirection');
+		m.addItem('up');
+		m.addItem('down');
 		showMenu(m);
 	}
 

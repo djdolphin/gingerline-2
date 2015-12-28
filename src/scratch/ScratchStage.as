@@ -857,7 +857,7 @@ public class ScratchStage extends ScratchObj {
 		json.writeKeyValue('penLayerID', penLayerID);
 		json.writeKeyValue('tempoBPM', tempoBPM);
 		json.writeKeyValue('videoAlpha', videoAlpha);
-		json.writeKeyValue('children', children);
+		json.writeKeyValue('children', children, true);
 		json.writeKeyValue('info', info);
 	}
 

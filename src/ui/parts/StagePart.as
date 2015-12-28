@@ -55,7 +55,7 @@ public class StagePart extends UIPart {
 	private var stopButton:IconButton;
 	private var fullscreenButton:IconButton;
 	private var stageSizeButton:Sprite;
-	
+
 	//video recording tools
 	private var stopRecordingButton:IconButton;
 	private var recordingIndicator:Shape;
@@ -87,7 +87,7 @@ public class StagePart extends UIPart {
 		fixLayout();
 		addEventListener(MouseEvent.MOUSE_WHEEL, mouseWheel);
 	}
-	
+
 	public static function strings():Array {
 		return [
 			'by', 'shared', 'unshared', 'Turbo Mode',
@@ -154,7 +154,7 @@ public class StagePart extends UIPart {
 		videoProgressBar.visible = (app.runtime.ready==ReadyLabel.COUNTDOWN || app.runtime.recording) && app.editMode;
 		recordingTime.visible = (app.runtime.ready==ReadyLabel.COUNTDOWN || app.runtime.recording) && app.editMode;
 		recordingIndicator.visible = app.runtime.recording && app.editMode;
-		
+
 		if (app.editMode) {
 			fullscreenButton.setOn(false);
 			drawStageSizeButton();
@@ -214,7 +214,7 @@ public class StagePart extends UIPart {
 		var top:int = h + 1;
 		xReadout.y = yReadout.y = top;
 		xLabel.y = yLabel.y = top - 2;
-		
+
 		//recording tools
 		stopRecordingButton.x=2;
 		stopRecordingButton.y=top+2;
@@ -230,13 +230,13 @@ public class StagePart extends UIPart {
 
 		if (playButton) playButton.scaleX = playButton.scaleY = app.stagePane.scaleX;
 	}
-	
+
 	private var lastTime:int=0;
-	
+
 	private function addRecordingTools():void {
 		stopRecordingButton = new IconButton(app.stopVideo, 'stopVideo');
 		addChild(stopRecordingButton);
-		
+
 		videoProgressBar = new Shape();
 		var slotColor:int = CSS.overColor;
 		var slotColor2:int = 0xBBBDBF;
@@ -249,10 +249,10 @@ public class StagePart extends UIPart {
 		g.drawRoundRect(0, .5, 300, 9,9,9);
 		g.endFill();
 		addChild(videoProgressBar);
-		
+
 		const versionFormat:TextFormat = new TextFormat(CSS.font, 11, CSS.textColor);
 		addChild(recordingTime = makeLabel(" 0 secs",versionFormat));
-		
+
 		recordingIndicator = new Shape();
 		var k:Graphics = recordingIndicator.graphics;
 		k.clear();
@@ -261,25 +261,25 @@ public class StagePart extends UIPart {
 		k.endFill();
 		addChild(recordingIndicator);
 	}
-	
+
 	private function resetTime():void {
 		updateRecordingTools(0);
-		
+
 		removeChild(stopRecordingButton);
-		
+
 		stopRecordingButton = new IconButton(app.stopVideo, 'stopVideo');
 		addChild(stopRecordingButton);
-		
+
 		fixLayout();
 	}
-	
+
 	public function removeRecordingTools():void {
 		stopRecordingButton.visible=false;
 		videoProgressBar.visible=false;
 		recordingTime.visible=false;
 		recordingIndicator.visible=false;
 	}
-	
+
 	public function updateRecordingTools(time:Number = -1.0):void {
 		if (time<0) {
 			time = Number(lastTime);
@@ -305,7 +305,7 @@ public class StagePart extends UIPart {
 		}
 		g.drawRoundRect(0, .5, barWidth, 9,9,9);
 		g.endFill();
-		
+
 		if (lastTime!=int(time)) {
 			var timeString:String = "";
 			if (int(time)<10) {
@@ -325,7 +325,7 @@ public class StagePart extends UIPart {
 			}
 		}
 	}
-	
+
 	private function addTitleAndInfo():void {
 		var fmt:TextFormat = app.isOffline ? new TextFormat(CSS.font, 16, CSS.textColor) : CSS.projectTitleFormat;
 		projectTitle = getProjectTitle(fmt);
@@ -565,6 +565,7 @@ public class StagePart extends UIPart {
 	private function mouseWheel(evt:MouseEvent):void {
 		evt.preventDefault();
 		app.runtime.startKeyHats(evt.delta > 0 ? 30 : 31);
+		app.runtime.startScrollHats(evt.delta > 0 ? 'up' : 'down');
 	}
 
 }}
