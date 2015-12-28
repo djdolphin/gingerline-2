@@ -678,11 +678,8 @@ public class ScratchRuntime {
 		} else if ('whenCondition' == hat.op) {
 			var condition:Boolean = interp.arg(hat, 0);
 			if (condition) {
-				if (triggeredHats.indexOf(hat) == -1) { // not already trigged
-					// only start the stack if it is not already running
-					if (!interp.isRunning(hat, target)) interp.toggleThread(hat, target);
-				}
-				activeHats.push(hat);
+				// only start the stack if it is not already running
+				if (!interp.isRunning(hat, target)) interp.toggleThread(hat, target);
 			}
 		} else if ('whenSensorConnected' == hat.op) {
 			if (getBooleanSensor(interp.arg(hat, 0))) {

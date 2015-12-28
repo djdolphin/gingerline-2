@@ -610,7 +610,9 @@ public class ScratchObj extends Sprite {
 		var ops = Scratch.app.runtime.getSpecialOpsUsed();
 
 		if (ops.indexOf('whenCondition') > -1) {
-			allVariables.push(new Variable(Specs.LAST_TIME_VAR, 0))
+			if (!ownsVar(Specs.LAST_TIME_VAR)) {
+				allVariables.push(new Variable(Specs.LAST_TIME_VAR, 0))
+			}
 			allScripts.push(
 				[10, 10, [
 					['whenGreenFlag'],
