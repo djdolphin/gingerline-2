@@ -611,7 +611,7 @@ public class ScratchObj extends Sprite {
 
 		if (ops.indexOf('whenCondition') > -1) {
 			if (!ownsVar(Specs.LAST_TIME_VAR)) {
-				allVariables.push(new Variable(Specs.LAST_TIME_VAR, 0))
+				allVariables.push(new Variable(Specs.LAST_TIME_VAR, 0));
 			}
 			allScripts.push(
 				[10, 10, [
